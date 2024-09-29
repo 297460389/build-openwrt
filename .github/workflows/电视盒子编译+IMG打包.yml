@@ -339,6 +339,8 @@ jobs:
 
       - name: Upload the packaged OpenWrt
         uses: ncipollo/release-action@main
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.codes.outputs.build_tag }}
