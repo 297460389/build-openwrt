@@ -200,6 +200,7 @@ jobs:
       - name: Initialization environment
         id: init
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBIAN_FRONTEND: noninteractive
         run: |
           docker rmi `docker images -q`
