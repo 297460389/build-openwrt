@@ -46,7 +46,7 @@ echo 'src-git openwrt-packages https://github.com/dansir118/openwrt-packages' >>
 # Add third-party software packages (The entire repository)
  git clone https://github.com/dansir118/openwrt-packages.git package/openwrt-packages
 # Add third-party software packages (Specify the package)
- svn co https://github.com/dansir118/openwrt-packages/trunk/luci-app-pptp-server package/luci-app-pptp-server
+# svn co https://github.com/dansir118/openwrt-packages/trunk/luci-app-pptp-server package/luci-app-pptp-server
 # Add to compile options (Add related dependencies according to the requirements of the third-party software package Makefile)
 # sed -i "/DEFAULT_PACKAGES/ s/$/ pirania-app pirania ip6tables-mod-nat ipset shared-state-pirania uhttpd-mod-lua/" target/linux/armvirt/Makefile
 
