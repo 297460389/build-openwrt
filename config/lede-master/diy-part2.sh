@@ -32,7 +32,7 @@ echo "DISTRIB_SOURCECODE='lede'" >>package/base-files/files/etc/openwrt_release
 
 echo 'src-git amlogic https://github.com/ophub/luci-app-amlogic' >>feeds.conf.default
 
-echo 'src-git openwrt-packages https://github.com/dansir118/openwrt-packages' >>feeds.conf.default
+#echo 'src-git openwrt-packages https://github.com/dansir118/openwrt-packages' >>feeds.conf.default
 
 
 # Fix runc version error
@@ -44,7 +44,7 @@ echo 'src-git openwrt-packages https://github.com/dansir118/openwrt-packages' >>
 # svn co https://github.com/Lienol/openwrt-packages/trunk/utils/{containerd,libnetwork,runc,tini} feeds/packages/utils
 
 # Add third-party software packages (The entire repository)
- git clone https://github.com/dansir118/openwrt-packages.git package/openwrt-packages
+# git clone https://github.com/dansir118/openwrt-packages.git package/openwrt-packages
 # Add third-party software packages (Specify the package)
 # svn co https://github.com/dansir118/openwrt-packages/trunk/luci-app-pptp-server package/luci-app-pptp-server
 # Add to compile options (Add related dependencies according to the requirements of the third-party software package Makefile)
