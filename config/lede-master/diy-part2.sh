@@ -32,6 +32,8 @@ echo "DISTRIB_SOURCECODE='lede'" >>package/base-files/files/etc/openwrt_release
 
 echo 'src-git amlogic https://github.com/ophub/luci-app-amlogic' >>feeds.conf.default
 
+echo 'src-git openwrt-packages https://github.com/dansir118/openwrt-packages' >>feeds.conf.default
+
 
 # Fix runc version error
 # rm -rf ./feeds/packages/utils/runc/Makefile
