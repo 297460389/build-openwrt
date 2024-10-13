@@ -6588,7 +6588,7 @@ CONFIG_OPENCONNECT_GNUTLS=y
 # CONFIG_PACKAGE_openvpn-mbedtls is not set
 # CONFIG_PACKAGE_openvpn-openssl is not set
 # CONFIG_PACKAGE_openvpn-wolfssl is not set
-CONFIG_PACKAGE_pptpd=y
+# CONFIG_PACKAGE_pptpd is not set
 # CONFIG_PACKAGE_softethervpn-base is not set
 # CONFIG_PACKAGE_softethervpn-bridge is not set
 # CONFIG_PACKAGE_softethervpn-client is not set
