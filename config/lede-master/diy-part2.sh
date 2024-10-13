@@ -22,7 +22,7 @@ echo "DISTRIB_SOURCECODE='lede'" >>package/base-files/files/etc/openwrt_release
  sed -i 's/192.168.1.1/192.168.3.33/g' package/base-files/files/bin/config_generate
 # sed -i 's/$1$zQaIXyAb$gyLqELl5w39SAgDAlg8A10/$1$eJUzBgbi$mlMdHdKSBi7ahpwg4Rnn9/g' package/base-files/files/etc/shadow
 # sed -i 's/root:::0:99999:7:::/root:$1$tjHrhre.$IsKdyVDarSRGYIeVCwii31::0:99999:7:::/g' package/base-files/files/etc/shadow
-sed -i 's/root:::0:99999:7:::/root:$1$.UDR2Mtz$bI3C3z1CzClHlytd2gR.8.::0:99999:7:::/g' package/base-files/files/etc/shadow
+sed -i 's/root:::0:99999:7:::/root:$1$AlGgu0xj$ChBdWyyAyHdjOmT1ckc1X0::0:99999:7:::/g' package/base-files/files/etc/shadow
 # Replace the default software source
 # sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn\\/openwrt#' package/lean/default-settings/files/zzz-default-settings
 #
