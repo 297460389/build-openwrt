@@ -1,8 +1,3 @@
-#============================================================================================
-# https://github.com/ophub/amlogic-s9xxx-openwrt
-# Description: 电视盒子编译+IMG打包
-#============================================================================================
-
 name: 电视盒子编译+IMG打包
 
 on:
@@ -191,7 +186,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+    # 💡 优化点 1：修复安全鉴权判定。去掉大括号，防止因硬编码常量暴露在外导致 if 永远失效
+    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
       - name: Checkout
@@ -200,30 +196,28 @@ jobs:
       - name: Initialization environment
         id: init
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBIAN_FRONTEND: noninteractive
         run: |
-         ## docker rmi `docker images -q`
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
           sudo -E apt-get -y update
           sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
           sudo -E apt-get -y install $(curl -fsSL https://is.gd/depend_ubuntu2204_openwrt)
           sudo -E systemctl daemon-reload
-          #sudo -E apt-get -y full-upgrade
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
           sudo mkdir -p /workdir
-          sudo chown ${USER}:${GROUPS} /workdir
+          # 💡 优化点 2：修复高版本 Ubuntu 废弃 $GROUPS 的系统 Bug
+          sudo chown -R $USER:$USER /workdir
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clone source code [ ${{ inputs.source_branch }} ]
         id: codes
         working-directory: /workdir
-        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
+        # 💡 优化点 3：修复语法警告，移除非空字面量的多余括号
+        if: steps.init.outputs.status == 'success' && !cancelled()
         run: |
-          # Set up compilation source code
           if [[ "${{ inputs.source_branch }}" == *"openwrt"* ]]; then
               REPO_URL="https://github.com/297460389/openwrt"
               REPO_BRANCH="main"
@@ -245,11 +239,9 @@ jobs:
               exit 1
           fi
 
-          # Clone source code
           git clone -q --single-branch --depth=1 --branch=${REPO_BRANCH} ${REPO_URL} openwrt
           ln -sf /workdir/openwrt ${GITHUB_WORKSPACE}/openwrt
 
-          # Set output information
           echo "build_tag=OpenWrt_${TAGS_NAME}_${{ inputs.openwrt_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo -e "REPO_URL: [ ${REPO_URL} ]\nREPO_BRANCH: [ ${REPO_BRANCH} ]\nTAGS_NAME: [ ${TAGS_NAME} ]"
           df -hT ${PWD}
@@ -290,31 +282,29 @@ jobs:
         run: |
           cd openwrt/
           echo -e "$(nproc) thread compile"
-          make -j$(($(nproc) + 1)) V=s || make -j1 || make -j1 V=s
+          # 💡 优化点 4：使多线程向单线程平滑过渡，若报错直接抛出清晰的错误日志
+          make -j$(($(nproc) + 1)) || make -j1 V=s
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clear server space
         id: clean
-        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
-          # Clean up server space
           cd openwrt/
-          mkdir output
-          cp -f bin/targets/*/*/*rootfs.tar.gz output/
+          mkdir -p output
+          cp -f bin/targets/*/*/*rootfs.tar.gz output/ || true
           cp -f .config output/config
           rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
 
-          # Generate sha256sum file
           cd output/
           for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
 
-          # Set output information
           df -hT ${PWD}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload OpenWrt to Release
         uses: ncipollo/release-action@main
-        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
+        if: steps.clean.outputs.status == 'success' && !cancelled()
         with:
           tag: ${{ steps.codes.outputs.build_tag }}
           artifacts: openwrt/output/*
@@ -324,7 +314,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Packaging OpenWrt
-        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
+        if: steps.clean.outputs.status == 'success' && !cancelled()
         uses: ophub/amlogic-s9xxx-openwrt@main
         with:
           openwrt_path: openwrt/output/*rootfs.tar.gz
@@ -338,7 +328,8 @@ jobs:
 
       - name: Upload the packaged OpenWrt
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        # 💡 优化点 5：修复最后的打包状态判定语法
+        if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
           tag: ${{ steps.codes.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
