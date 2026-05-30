@@ -189,9 +189,6 @@ jobs:
     runs-on: ubuntu-22.04
     # 💡 优化点 1：修复安全鉴权判定。去掉大括号，防止因硬编码常量暴露在外导致 if 永远失效
     if: github.event.repository.owner.id == github.event.sender.id
-    permissions:
-      contents: write
-      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
